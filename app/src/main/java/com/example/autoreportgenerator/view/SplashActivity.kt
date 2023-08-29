@@ -1,0 +1,26 @@
+package com.example.autoreportgenerator.view
+
+import android.content.Intent
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import androidx.appcompat.app.AppCompatActivity
+import com.example.autoreportgenerator.R
+
+class SplashActivity : AppCompatActivity() {
+
+    private val SPLASH_TIME_OUT: Long = 3000 // 3 seconds
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_splash)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            // This method will be executed once the timer is over
+            // Start your main activity
+            val i = Intent(this@SplashActivity, RegistrationActivity::class.java)
+            startActivity(i)
+            finish()
+        }, SPLASH_TIME_OUT)
+    }
+}
