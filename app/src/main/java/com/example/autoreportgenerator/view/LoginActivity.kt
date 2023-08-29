@@ -49,9 +49,18 @@ class LoginActivity : AppCompatActivity()  {
            val intent = Intent(this, RegistrationActivity::class.java)
             startActivity(intent)
         }
-        viewModel.loginState.observe(this, Observer {
-            if(it){
-              Toast.makeText(this,"Login Success",Toast.LENGTH_LONG).show()
+        viewModel.loginResponseState.observe(this, Observer {
+            if(it["response"] == "success"){
+                val bundle = Bundle()
+                bundle.putString("token", it["token"])
+                bundle.putString("name", it["name"])
+                bundle.putString("userId", it["userId"])
+                bundle.putBoolean("isDoctor", it["isDoctor"] == "doctor")
+                val intent = Intent(this, HomeActivity::class.java)
+                intent.putExtras(bundle)
+                startActivity(intent)
+            } else{
+                Toast.makeText(this, "Something went wrong. Try again!", Toast.LENGTH_SHORT).show()
             }
         })
 //        viewModel.loginState.observe(this, { state ->

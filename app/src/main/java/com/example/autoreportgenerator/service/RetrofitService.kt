@@ -17,13 +17,19 @@ interface RetrofitService {
     @GET("api/auth/verify/{token}")
     suspend fun verifyRegistration(@Path("token") token: String) : Response<RegisterResponse>
 
-    //@Headers("Accept: application/json")
+    @Headers("Accept: application/json")
     @POST("api/auth/login")
     suspend fun submitLogin(@Body loginModel: LoginUser): Response<LoginResponse>
 
     @Headers("Accept: application/json")
     @GET("api/auth")
     suspend fun verifyLogin(@HeaderMap headers: Map<String, String>): Response<LoginValidateResponse>
+
+    @POST("api/auth/scan")
+    suspend fun postScan(@HeaderMap headers: Map<String, String>, @Body model: ScanRequest) : Response<RegisterResponse>
+
+    @GET("api/report")
+    suspend fun fetchReport(@HeaderMap headers: Map<String, String>) : Response<Void>
 
 
 

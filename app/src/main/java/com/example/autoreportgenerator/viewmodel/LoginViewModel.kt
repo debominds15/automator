@@ -3,10 +3,7 @@ package com.example.autoreportgenerator.viewmodel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.autoreportgenerator.model.LoginResponse
-import com.example.autoreportgenerator.model.LoginUser
-import com.example.autoreportgenerator.model.RegisterResponse
-import com.example.autoreportgenerator.model.RegistrationUser
+import com.example.autoreportgenerator.model.*
 import com.example.autoreportgenerator.repo.LoginRepo
 import com.example.autoreportgenerator.repo.RegistrationRepo
 import kotlinx.coroutines.*
@@ -14,6 +11,7 @@ import kotlinx.coroutines.*
 class LoginViewModel(private val regRepository: LoginRepo) : ViewModel() {
 
     val loginState = MutableLiveData<Boolean>()
+    val loginResponseState = MutableLiveData<HashMap<String, String>>()
 
     var job: Job? = null
 
@@ -35,20 +33,23 @@ class LoginViewModel(private val regRepository: LoginRepo) : ViewModel() {
 // }
         job = CoroutineScope(Dispatchers.IO).launch {
             val response: LoginResponse = regRepository.postLogin(model)
-            withContext(Dispatchers.Main) {
-                if (response.code == 200) {
-                    val token = response.loginresults?.token ?: ""
-                    val responseValidate = regRepository.validateLogin(getHeaderMap(token))
-                    Log.d("VAMSI",responseValidate.code.toString())
-                    if (responseValidate.code == 200)
-                        loginState.postValue(true)
-                    else {
-                        loginState.postValue(false)
-                        //loading.value = false
+            if (response.code == 200) {
+                val token = response.loginresults?.token ?: ""
+                val responseValidate = regRepository.validateLogin(getHeaderMap(token))
+                withContext(Dispatchers.Main) {
+                    val hashMap: HashMap<String, String> = HashMap()
+                    if (responseValidate.code == 200) {
+                        hashMap["name"] = responseValidate.loginresults?.loginUserRes?.name?:"User"
+                        hashMap["token"] = token
+                        hashMap["userId"] = responseValidate.loginresults?.loginUserRes?.Id?:"id"
+                        hashMap["isDoctor"] =
+                            if (responseValidate.loginresults?.loginUserRes?.isRoleTypeDoctor == true)  "doctor" else "patient"
+                        hashMap["response"] = "success"
                     }
-                } else {
-                    loginState.postValue(false)
-                    //onError("Error : ${response.message()} ")
+                    else {
+                        hashMap["response"] = "fail"
+                    }
+                    loginResponseState.postValue(hashMap)
                 }
             }
         }
