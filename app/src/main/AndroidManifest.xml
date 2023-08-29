@@ -26,6 +26,11 @@
             android:exported="false"
             android:label="@string/title_activity_registartion"
             android:theme="@style/Theme.AutoReportGenerator.NoActionBar" />
+        <activity
+            android:name=".view.LoginActivity"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.AutoReportGenerator.NoActionBar"/> >
     </application>
 
 </manifest>

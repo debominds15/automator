@@ -1,9 +1,11 @@
 package com.example.autoreportgenerator.view
 
+import android.content.Intent
 import com.example.autoreportgenerator.viewmodel.RegistrationViewModel
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.autoreportgenerator.R
 import com.example.autoreportgenerator.model.RegistrationUser
@@ -57,5 +59,11 @@ class RegistrationActivity : AppCompatActivity() {
             Toast.makeText(this, state, Toast.LENGTH_SHORT).show()
         })*/
 
+        viewModel.registrationState.observe(this, Observer {
+            if(it){
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        })
     }
 }

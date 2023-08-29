@@ -1,5 +1,6 @@
 package com.example.autoreportgenerator.repo
 
+import com.example.autoreportgenerator.model.LoginUser
 import com.example.autoreportgenerator.model.RegisterResponse
 import com.example.autoreportgenerator.model.RegistrationUser
 import com.example.autoreportgenerator.service.RetrofitService
@@ -13,5 +14,4 @@ class RegistrationRepo constructor(private val retrofitService: RetrofitService)
 
     suspend fun validateRegistration(token: String): RegisterResponse =
         retrofitService.verifyRegistration(token).body()!!
-
 }

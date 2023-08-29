@@ -18,7 +18,7 @@ class SplashActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             // This method will be executed once the timer is over
             // Start your main activity
-            val i = Intent(this@SplashActivity, RegistrationActivity::class.java)
+            val i = Intent(this@SplashActivity, LoginActivity::class.java)
             startActivity(i)
             finish()
         }, SPLASH_TIME_OUT)

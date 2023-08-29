@@ -1,15 +1,22 @@
 package com.example.autoreportgenerator.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.autoreportgenerator.R
 import com.example.autoreportgenerator.model.LoginUser
-import com.example.autoreportgenerator.model.RegistrationUser
+import com.example.autoreportgenerator.repo.LoginRepo
+import com.example.autoreportgenerator.repo.RegistrationRepo
+import com.example.autoreportgenerator.service.RetrofitService
+import com.example.autoreportgenerator.utils.LoginViewModelFactory
+import com.example.autoreportgenerator.utils.MyViewModelFactory
 import com.example.autoreportgenerator.viewmodel.LoginViewModel
+import com.example.autoreportgenerator.viewmodel.RegistrationViewModel
 
 class LoginActivity : AppCompatActivity()  {
     private lateinit var viewModel: LoginViewModel
@@ -20,20 +27,36 @@ class LoginActivity : AppCompatActivity()  {
 
         val usernameEditText: EditText = findViewById(R.id.usernameEditText)
         val passwordEditText: EditText = findViewById(R.id.passwordEditText)
-        val registerButton: Button = findViewById(R.id.loginButton)
+        val loginButton: Button = findViewById(R.id.loginButton)
+        val regButton: Button = findViewById(R.id.registerButton)
 
-        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+        val retrofitService = RetrofitService.getInstance()
+        val regRepository = LoginRepo(retrofitService)
 
-        registerButton.setOnClickListener {
-            val user = LoginUser(
-                username = usernameEditText.text.toString(),
-                password = passwordEditText.text.toString(),
+        viewModel = ViewModelProvider(this,
+            LoginViewModelFactory(regRepository)
+        )[LoginViewModel::class.java]
+
+        loginButton.setOnClickListener{
+            val loginRequest = LoginUser(
+                email = usernameEditText.text.toString(),
+                password = passwordEditText.text.toString()
             )
-            viewModel.login(user)
+            viewModel.login(loginRequest)
         }
 
-        viewModel.loginState.observe(this, { state ->
-            Toast.makeText(this, state, Toast.LENGTH_SHORT).show()
+        regButton.setOnClickListener {
+           val intent = Intent(this, RegistrationActivity::class.java)
+            startActivity(intent)
+        }
+        viewModel.loginState.observe(this, Observer {
+            if(it){
+              Toast.makeText(this,"Login Success",Toast.LENGTH_LONG).show()
+            }
         })
+//        viewModel.loginState.observe(this, { state ->
+//            Toast.makeText(this, state, Toast.LENGTH_SHORT).show()
+//
+//        })
     }
 }

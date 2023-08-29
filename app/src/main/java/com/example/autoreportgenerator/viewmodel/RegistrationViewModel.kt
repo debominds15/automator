@@ -29,7 +29,7 @@ class RegistrationViewModel(private val regRepository: RegistrationRepo) : ViewM
                 if (response.code == 201) {
                     val token = response.results?.verification?.token ?: ""
                     val responseValidate = regRepository.validateRegistration(token)
-                    if (responseValidate.code == 201)
+                    if (responseValidate.code == 200)
                         registrationState.postValue(true)
                     else {
                         registrationState.postValue(false)
