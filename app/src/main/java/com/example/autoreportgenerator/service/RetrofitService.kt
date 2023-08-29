@@ -18,8 +18,8 @@ interface RetrofitService {
     @POST("api/auth/register")
     suspend fun submitRegistration(@Body registermodel: RegistrationUser) : Response<RegisterResponse>
 
-    @POST("api/auth/verify")
-    suspend fun verifyRegistration(@Path("user") token: String) : Response<RegisterResponse>
+    @GET("api/auth/verify/{token}")
+    suspend fun verifyRegistration(@Path("token") token: String) : Response<RegisterResponse>
 
 
     companion object {

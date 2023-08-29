@@ -26,9 +26,10 @@ class RegistrationViewModel(private val regRepository: RegistrationRepo) : ViewM
         job = CoroutineScope(Dispatchers.IO).launch {
             val response: RegisterResponse = regRepository.postRegistration(model)
             withContext(Dispatchers.Main) {
-                if (response.code == 200) {
-                    regRepository.validateRegistration(response.results?.verification?.token ?: "")
-                    if (response.code == 200)
+                if (response.code == 201) {
+                    val token = response.results?.verification?.token ?: ""
+                    val responseValidate = regRepository.validateRegistration(token)
+                    if (responseValidate.code == 201)
                         registrationState.postValue(true)
                     else {
                         registrationState.postValue(false)
