@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    def fragment_version = "1.5.7"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -56,4 +57,22 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.7.2"
     implementation "com.squareup.okhttp3:logging-interceptor:4.7.2"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+
+// PDF viewer
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+
+// View Pager 2
+    //implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+
+
+    // Java language implementation
+    implementation("androidx.fragment:fragment:$fragment_version")
+    // Kotlin
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
+
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+
+
 }

@@ -1,10 +1,9 @@
-package com.example.autoreportgenerator
+package com.example.autoreportgenerator.model
 
-import com.example.autoreportgenerator.model.ScanResults
 import com.google.gson.annotations.SerializedName
 
 
-data class ScanResponse (
+data class PatientResponse (
 
     @SerializedName("message" )
     var message : String?  = null,
@@ -13,6 +12,5 @@ data class ScanResponse (
     @SerializedName("code"    )
     var code    : Int?     = null,
     @SerializedName("results" )
-    var results : ScanResults? = ScanResults()
-
+    val results : PatientDataResults?
 )

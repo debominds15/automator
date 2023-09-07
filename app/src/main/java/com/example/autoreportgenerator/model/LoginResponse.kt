@@ -12,6 +12,8 @@ data class LoginResponse (
     @SerializedName("code"    )
     var code    : Int?     = null,
     @SerializedName("results" )
-    var loginresults : LoginResults? = LoginResults()
+    var loginresults : LoginResults? = LoginResults()/*,
+    @SerializedName("errors" )
+    var errors : String? = null*/
 
 )

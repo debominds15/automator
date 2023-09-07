@@ -2,8 +2,10 @@ package com.example.autoreportgenerator.service
 
 import com.example.autoreportgenerator.model.*
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,12 +27,22 @@ interface RetrofitService {
     @GET("api/auth")
     suspend fun verifyLogin(@HeaderMap headers: Map<String, String>): Response<LoginValidateResponse>
 
-    @POST("api/auth/scan")
+    @POST("api/auth/registerscan")
     suspend fun postScan(@HeaderMap headers: Map<String, String>, @Body model: ScanRequest) : Response<RegisterResponse>
 
-    @GET("api/report")
-    suspend fun fetchReport(@HeaderMap headers: Map<String, String>) : Response<Void>
+    @GET("api/auth/scan")
+    suspend fun fetchAllScanData(@HeaderMap headers: Map<String, String>) : Response<ScanResponse>
 
+    @GET("api/auth/patients")
+    suspend fun getAllPatients(@HeaderMap headers: Map<String, String>) : Response<PatientResponse>
+
+
+    @POST("api/auth/generatepdf")
+    suspend fun uploadReport(@HeaderMap headers: Map<String, String>, @Body model: ScanRequest) : Response<FileReportResponse>
+
+    @Streaming
+    @GET("generatepdf")
+    suspend fun downloadReport(@Url fileUrl: String) : Call<ResponseBody>
 
 
     companion object {

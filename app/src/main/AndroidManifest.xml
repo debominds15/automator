@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.autoreportgenerator">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -33,9 +37,10 @@
             android:theme="@style/Theme.AutoReportGenerator.NoActionBar"/> >
         <activity
             android:name=".view.HomeActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_home"
-            android:theme="@style/Theme.AutoReportGenerator.NoActionBar"/> >
+            android:theme="@style/Theme.AutoReportGenerator.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

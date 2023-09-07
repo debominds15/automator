@@ -3,7 +3,7 @@ package com.example.autoreportgenerator.model
 import com.google.gson.annotations.SerializedName
 
 
-data class RegisterResponse(
+data class ScanResponse(
 
     @SerializedName("message")
     var message: String? = null,
@@ -12,5 +12,5 @@ data class RegisterResponse(
     @SerializedName("code")
     var code: Int? = null,
     @SerializedName("results")
-    var results: Results? = Results()
+    val results: ScanDataResults?
 )
