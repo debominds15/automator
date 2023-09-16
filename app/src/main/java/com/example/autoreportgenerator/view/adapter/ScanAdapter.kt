@@ -1,5 +1,7 @@
 package com.example.autoreportgenerator.view.adapter
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,9 +38,8 @@ class ScanAdapter(
         holder.age.text = scanData.patientAge ?: "-"
 
         holder.viewReport.setOnClickListener {
-
-            /*val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(scanData.pdfUrl))
-            holder.itemView.context.startActivity(browserIntent)*/
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(scanData.pdfUrl))
+            holder.itemView.context.startActivity(browserIntent)
         }
         holder.itemView.setOnClickListener {
             mClickListener?.onItemClicked(scanData)

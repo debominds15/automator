@@ -11,6 +11,8 @@ data class RegisterResponse(
     var error: Boolean? = null,
     @SerializedName("code")
     var code: Int? = null,
+    @SerializedName("errors")
+    var errors: Errors? = Errors(),
     @SerializedName("results")
     var results: Results? = Results()
 )

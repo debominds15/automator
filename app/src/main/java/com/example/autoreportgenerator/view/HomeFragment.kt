@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.autoreportgenerator.R
 import com.example.autoreportgenerator.model.ScanData
 import com.example.autoreportgenerator.repo.HomeRepo
+import com.example.autoreportgenerator.service.RetrofitChatService
 import com.example.autoreportgenerator.service.RetrofitService
 import com.example.autoreportgenerator.utils.HomeViewModelFactory
 import com.example.autoreportgenerator.utils.OnClickListener
@@ -27,6 +28,7 @@ class HomeFragment : Fragment(), OnClickListener {
     private lateinit var viewModel: HomeViewModel
     private lateinit var token: String
     private lateinit var userId: String
+    private var isDoctor = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,20 +42,17 @@ class HomeFragment : Fragment(), OnClickListener {
 
     private fun init(view: View) {
         val retrofitService = RetrofitService.getInstance()
-        val homeRepository = HomeRepo(retrofitService)
+        val chatRetrofitService = RetrofitChatService.getInstance()
+        val homeRepository = HomeRepo(retrofitService, chatRetrofitService)
         val username = view.findViewById<TextView>(R.id.tv_name)
-        val downloadButton: Button = view.findViewById(R.id.downloadBtn)
         val addScanBtn: FloatingActionButton = view.findViewById(R.id.btn_add_scan)
         val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val llAllReports = view.findViewById<LinearLayout>(R.id.layout_all_reports)
         val progressBar: ProgressBar = view.findViewById(R.id.progress_bar)
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
         val logoutButton: Button = view.findViewById(R.id.logoutButton)
+        val tvNoHistory: TextView = view.findViewById(R.id.tv_no_history)
 
-
-        //val downloadButton: Button = view.findViewById(R.id.downloadButton)
-
-        var isDoctor = false
+        isDoctor = false
 
         viewModel = ViewModelProvider(
             requireActivity(),
@@ -69,31 +68,58 @@ class HomeFragment : Fragment(), OnClickListener {
         }
 
         if (isDoctor) {
-            llAllReports.visibility = View.VISIBLE
-            downloadButton.visibility = View.GONE
+            viewModel.getAllScanData(token)
+            //downloadButton.visibility = View.GONE
             addScanBtn.visibility = View.VISIBLE
         } else {
-            downloadButton.visibility = View.VISIBLE
-            llAllReports.visibility = View.GONE
+            viewModel.getAllReportData(token)
+            //downloadButton.visibility = View.VISIBLE
             addScanBtn.visibility = View.GONE
-
         }
+
+        viewModel.getAllListOfPatients(token)
 
 
         rv.layoutManager = LinearLayoutManager(activity)
 
         viewModel.homeScanData.observe(viewLifecycleOwner) { lists ->
             progressBar.visibility = View.GONE
+            swipeRefreshLayout.isRefreshing = false;
             if (lists.isNotEmpty()) {
                 val adapter = ScanAdapter(lists, this)
                 rv.adapter = adapter
+                tvNoHistory.visibility = View.GONE
+            } else {
+                tvNoHistory.visibility = View.VISIBLE
             }
         }
 
-        viewModel.getAllScanData(token)
+        viewModel.homeUploadFile.observe(viewLifecycleOwner) { isFileUploaded ->
+            if (!isFileUploaded)
+                Toast.makeText(
+                    activity,
+                    "File was not uploaded successfully!! Please try again with valid inputs!",
+                    Toast.LENGTH_LONG
+                ).show()
+        }
+
+        viewModel.homeReportData.observe(viewLifecycleOwner) { lists ->
+            progressBar.visibility = View.GONE
+            swipeRefreshLayout.isRefreshing = false;
+            if (lists.isNotEmpty()) {
+                val adapter = ScanAdapter(lists, this)
+                rv.adapter = adapter
+                tvNoHistory.visibility = View.GONE
+            } else {
+                tvNoHistory.visibility = View.VISIBLE
+            }
+        }
 
         swipeRefreshLayout.setOnRefreshListener {
-            viewModel.getAllScanData(token)
+            if (isDoctor)
+                viewModel.getAllScanData(token)
+            else
+                viewModel.getAllReportData(token)
         }
 
         addScanBtn.setOnClickListener {
@@ -101,6 +127,7 @@ class HomeFragment : Fragment(), OnClickListener {
             bundle.putBoolean("is_edit", false)
             bundle.putString("token", token)
             bundle.putString("user_id", userId)
+            bundle.putBoolean("isDoctor", isDoctor)
             requireActivity().supportFragmentManager.let {
                 ScanDialogPDFragment.newInstance(bundle)
                     .show(requireActivity().supportFragmentManager, "PatientDialog")
@@ -125,6 +152,7 @@ class HomeFragment : Fragment(), OnClickListener {
         bundle.putBoolean("is_edit", true)
         bundle.putString("token", token)
         bundle.putString("user_id", userId)
+        bundle.putBoolean("isDoctor", isDoctor)
         requireActivity().supportFragmentManager.let {
             ScanDialogPDFragment.newInstance(bundle)
                 .show(requireActivity().supportFragmentManager, "PatientDialog")

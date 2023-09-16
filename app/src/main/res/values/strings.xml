@@ -15,6 +15,8 @@
     <string name="lbl_logout">Logout</string>
     <string name="lbl_scanned_on">Scanned On</string>
     <string name="lbl_report">Report</string>
+    <string name="lbl_no_history">No History</string>
+    <string name="lbl_scan_history">Scan History</string>
 
     <string-array name="roles">
         <item>Doctor</item>

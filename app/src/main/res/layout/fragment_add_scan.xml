@@ -3,48 +3,108 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginEnd="20dp"
     android:layout_marginBottom="30dp">
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="20dp">
             <!--on below line we are creating our pdf view-->
 
             <TextView
                 android:id="@+id/tv_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="PATIENT FORM"
-                android:textStyle="bold"
                 android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_form"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="30dp"
+                android:layout_toStartOf="@+id/iv_file"
+                android:text="Select file" />
+
+            <ImageView
+                android:id="@+id/iv_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/tv_select"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/baseline_insert_drive_file_24" />
+
+            <RelativeLayout
+                android:id="@+id/layout_gen_summary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="10dp"/>
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_name"
+                android:layout_below="@+id/tv_select">
+
+                <TextView
+                    android:id="@+id/tv_gen_report"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Generate summary" />
+
+                <ImageView
+                    android:id="@+id/iv_gen_summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/baseline_settings_24" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tv_patient"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_form">
-                <EditText
-                    android:id="@+id/patientNameEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Patient Name"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_below="@+id/layout_gen_summary"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Patient" />
+
+            <Spinner
+                android:id="@+id/role_spinner"
+                style="@style/Widget.AppCompat.Spinner"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/dropdownListPreferredItemHeight"
+                android:layout_below="@+id/tv_patient"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/spinner_bg"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
+                android:popupBackground="@android:color/white"
+                android:popupElevation="3dp"
+                android:stateListAnimator="@drawable/spinner_sla" />
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_age"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/input_name"
+                android:layout_below="@+id/role_spinner"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/patientAgeEditText"
                     android:layout_width="match_parent"
@@ -59,6 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_age"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/doctorEditText"
                     android:layout_width="match_parent"
@@ -73,6 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_doctor"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/heightEditText"
                     android:layout_width="match_parent"
@@ -87,6 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_height"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/weightEditText"
                     android:layout_width="match_parent"
@@ -101,6 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_weight"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/bmiEditText"
                     android:layout_width="match_parent"
@@ -115,6 +179,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_bmi"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/scannedOnEditText"
                     android:layout_width="match_parent"
@@ -129,6 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_scanned_on"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/fhrEditText"
                     android:layout_width="match_parent"
@@ -143,6 +209,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_fhr"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/gaEditText"
                     android:layout_width="match_parent"
@@ -157,6 +224,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_ga"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/dvpEditText"
                     android:layout_width="match_parent"
@@ -171,6 +239,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_dvp"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/placentaLocEditText"
                     android:layout_width="match_parent"
@@ -185,25 +254,34 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/input_placenta_loc"
                 android:layout_marginTop="10dp">
+
                 <EditText
                     android:id="@+id/summaryLocEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Summary"
-                    android:lines="10"
-                    android:minLines="5"
                     android:gravity="top|left"
+                    android:hint="Summary"
+                    android:inputType="textMultiLine"
+                    android:lines="10"
                     android:maxLines="15"
-                    android:inputType="text" />
+                    android:minLines="5" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/btn_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/input_summary"
                 android:layout_marginTop="10dp"
-                android:text="Submit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:text="Submit" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminate="true"
+                android:visibility="gone" />
         </RelativeLayout>
     </ScrollView>
 </LinearLayout>

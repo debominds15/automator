@@ -2,17 +2,30 @@ package com.example.autoreportgenerator.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.autoreportgenerator.model.ErrorResponse
 import com.example.autoreportgenerator.model.LoginResponse
 import com.example.autoreportgenerator.model.LoginUser
 import com.example.autoreportgenerator.repo.LoginRepo
+import com.example.autoreportgenerator.service.Resource
 import kotlinx.coroutines.*
 
-class LoginViewModel(private val regRepository: LoginRepo) : ViewModel() {
+class LoginViewModel(private val loginRepository: LoginRepo) : ViewModel() {
 
-    val loginApiErrorState = MutableLiveData<String>()
-    val loginResponseState = MutableLiveData<HashMap<String, String>>()
+    var token = ""
+    val loginEvent = MutableLiveData<LoginEvent<Any>>()
+
 
     var job: Job? = null
+
+    sealed class LoginEvent<out T : Any> {
+
+        class Success<out T : Any>(val loginResponse: T) : LoginEvent<T>()
+        class ErrorResponseResult(val errorResponse: ErrorResponse) : LoginEvent<Nothing>()
+        class Failure(val message: String?) : LoginEvent<Nothing>()
+        object Loading : LoginEvent<Nothing>()
+        object Empty : LoginEvent<Nothing>()
+
+    }
 
     private fun getHeaderMap(token: String): Map<String, String> {
         val headerMap = mutableMapOf<String, String>()
@@ -22,36 +35,73 @@ class LoginViewModel(private val regRepository: LoginRepo) : ViewModel() {
     }
 
     fun login(model: LoginUser) {
-//        if (user.username.trim().isEmpty() || user.password.trim().isEmpty()) {
-//            loginState.value = "Please fill in all fields"
-//        } else {
-//            loginState.value = "login successfully"
-//            //ToDO: Call Login API here
-//            //ToDo: Move to Home Activity
-// }
+        loginEvent.value = LoginEvent.Loading
         job = CoroutineScope(Dispatchers.IO).launch {
-            val response: LoginResponse = regRepository.postLogin(model)
-            if (response.code == 200) {
-                //loginState.postValue(true)
-                val token = response.loginresults?.token ?: ""
-                val responseValidate = regRepository.validateLogin(getHeaderMap(token))
-                withContext(Dispatchers.Main) {
-                    val hashMap: HashMap<String, String> = HashMap()
-                    if (responseValidate.code == 200) {
-                        hashMap["name"] =
-                            responseValidate.loginresults?.loginUserRes?.name ?: "User"
-                        hashMap["token"] = token
-                        hashMap["userId"] = responseValidate.loginresults?.loginUserRes?.Id ?: "id"
-                        hashMap["isDoctor"] =
-                            if (responseValidate.loginresults?.loginUserRes?.isRoleTypeDoctor == true) "doctor" else "patient"
-                        hashMap["response"] = "success"
-                    } else {
-                        hashMap["response"] = "fail"
-                    }
-                    loginResponseState.postValue(hashMap)
-                }
+            if (model.email.trim().isEmpty() || model.password.trim().isEmpty()) {
+                loginEvent.value = LoginEvent.Failure("Please fill in all fields")
             } else {
-                loginApiErrorState.postValue("Something went wrong! Please try again.")
+                val response: Resource<LoginResponse> = loginRepository.postLogin(model)
+                withContext(Dispatchers.Main) {
+                    when (response) {
+
+                        is Resource.Success -> {
+                            loginEvent.value =
+                                LoginEvent.Success(response.data!!)
+                        }
+
+                        is Resource.ErrorRes -> {
+
+                            loginEvent.value =
+                                LoginEvent.ErrorResponseResult(
+                                    response.errorResponse
+                                        ?: ErrorResponse(message = "Something went wrong, please try again!")
+                                )
+
+                        }
+
+                        is Resource.Error -> {
+                            loginEvent.value =
+                                LoginEvent.Failure(response.message)
+
+                        }
+                        else -> {
+
+                        }
+                    }
+                }
+            }
+            //ToDO: Call Login API here
+            //ToDo: Move to Home Activity
+        }
+    }
+
+    fun performAuth(token: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val responseValidate = loginRepository.validateLogin(getHeaderMap(token))
+            withContext(Dispatchers.Main) {
+                when (responseValidate) {
+
+                    is Resource.Success -> {
+                        loginEvent.value = LoginEvent.Success(responseValidate.data!!)
+                    }
+
+                    is Resource.ErrorRes -> {
+
+                        loginEvent.value = LoginEvent.ErrorResponseResult(
+                            responseValidate.errorResponse
+                                ?: ErrorResponse(message = "Something went wrong, please try again!")
+                        )
+
+                    }
+
+                    is Resource.Error -> {
+                        loginEvent.value = LoginEvent.Failure(responseValidate.message)
+
+                    }
+                    else -> {
+
+                    }
+                }
             }
         }
     }

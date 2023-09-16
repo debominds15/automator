@@ -1,27 +1,27 @@
 package com.example.autoreportgenerator.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.autoreportgenerator.R
+import com.example.autoreportgenerator.model.LoginResponse
 import com.example.autoreportgenerator.model.LoginUser
+import com.example.autoreportgenerator.model.LoginValidateResponse
 import com.example.autoreportgenerator.repo.LoginRepo
 import com.example.autoreportgenerator.service.RetrofitService
 import com.example.autoreportgenerator.utils.LoginViewModelFactory
+import com.example.autoreportgenerator.utils.NetworkUtil
 import com.example.autoreportgenerator.viewmodel.LoginViewModel
 
-class LoginActivity : AppCompatActivity()  {
+class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -37,51 +37,112 @@ class LoginActivity : AppCompatActivity()  {
         val retrofitService = RetrofitService.getInstance()
         val regRepository = LoginRepo(retrofitService)
 
-        viewModel = ViewModelProvider(this,
+
+
+        viewModel = ViewModelProvider(
+            this,
             LoginViewModelFactory(regRepository)
         )[LoginViewModel::class.java]
 
-        loginButton.setOnClickListener{
-            progressBar.visibility = View.VISIBLE
-            if(tvError.visibility == View.VISIBLE)
+        loginButton.setOnClickListener {
+            if (progressBar.visibility == View.GONE)
+                progressBar.visibility = View.VISIBLE
+            if (tvError.visibility == View.VISIBLE)
                 tvError.visibility = View.GONE
-            val loginRequest = LoginUser(
-                email = usernameEditText.text.toString(),
-                password = passwordEditText.text.toString()
-            )
-            viewModel.login(loginRequest)
+            if (NetworkUtil.isNetworkConnected) {
+                val loginRequest = LoginUser(
+                    email = usernameEditText.text.toString(),
+                    password = passwordEditText.text.toString()
+                )
+                viewModel.login(loginRequest)
+            } else {
+                progressBar.visibility = View.GONE
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Please check your internet connection!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
         regButton.setOnClickListener {
             val intent = Intent(this, RegistrationActivity::class.java)
             startActivity(intent)
         }
-        viewModel.loginResponseState.observe(this, Observer {
-            progressBar.visibility = View.GONE
-            if(it["response"] == "success"){
-                val bundle = Bundle()
-                bundle.apply {
-                    putString("token", it["token"])
-                    putString("name", it["name"])
-                    putString("userId", it["userId"])
-                    putBoolean("isDoctor", it["isDoctor"] == "doctor")
-                }
-                val intent = Intent(this, HomeActivity::class.java)
-                intent.putExtras(bundle)
-                startActivity(intent)
-            } else{
-                Toast.makeText(this, "Something went wrong. Try again!", Toast.LENGTH_SHORT).show()
-            }
-        })
 
-        viewModel.loginApiErrorState.observe(this) { message ->
-            progressBar.visibility = View.GONE
-            tvError.visibility = View.VISIBLE
-            tvError.text = message
+        viewModel.loginEvent.observe(this) { response ->
+
+            when (response) {
+
+                is LoginViewModel.LoginEvent.Loading -> {
+                    progressBar.visibility = View.VISIBLE
+                }
+
+                is LoginViewModel.LoginEvent.Success -> {
+                    progressBar.visibility = View.GONE
+                    val result = response
+                    when (response.loginResponse) {
+                        is LoginResponse -> {
+                            val token = response.loginResponse.loginresults?.token ?: ""
+                            viewModel.token = token
+                            viewModel.performAuth(
+                                token
+                            )
+                        }
+                        is LoginValidateResponse -> {
+                            val bundle = Bundle()
+                            bundle.apply {
+                                putString("token", viewModel.token)
+                                putString(
+                                    "name",
+                                    response.loginResponse.loginresults?.loginUserRes?.name ?: ""
+                                )
+                                putString(
+                                    "userId",
+                                    response.loginResponse.loginresults?.loginUserRes?.Id ?: ""
+                                )
+                                putBoolean(
+                                    "isDoctor",
+                                    response.loginResponse.loginresults?.loginUserRes?.isRoleTypeDoctor
+                                        ?: false
+                                )
+                            }
+                            val intent = Intent(this, HomeActivity::class.java)
+                            intent.putExtras(bundle)
+                            startActivity(intent)
+                        }
+                    }
+                }
+                is LoginViewModel.LoginEvent.ErrorResponseResult -> {
+                    //We are doing our preferred stuff which we want in case of error response
+                    progressBar.visibility = View.GONE
+                    tvError.visibility = View.VISIBLE
+                    tvError.text =
+                        response.errorResponse.errors?.msg ?: response.errorResponse.message
+                }
+
+                is LoginViewModel.LoginEvent.Failure -> {
+                    progressBar.visibility = View.GONE
+                    tvError.visibility = View.VISIBLE
+                    tvError.text = response.message
+                }
+                else -> {
+                    progressBar.visibility = View.GONE
+                    tvError.visibility = View.VISIBLE
+                    tvError.text = "Please try again!"
+                }
+            }
         }
-//        viewModel.loginState.observe(this, { state ->
-//            Toast.makeText(this, state, Toast.LENGTH_SHORT).show()
-//
-//        })
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        NetworkUtil.registerConnectionCallback(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        NetworkUtil.unRegisterConnectionCallback()
     }
 }

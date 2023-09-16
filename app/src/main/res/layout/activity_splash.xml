@@ -3,13 +3,39 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimaryLight">
+
+    <ImageView
+        android:src="@drawable/ic_med_report"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_above="@+id/tv_automator"
+        android:layout_width="200dp"
+        android:layout_height="200dp"/>
+    <TextView
+        android:id="@+id/tv_automator"
+        android:text="Report Automator"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <ProgressBar
-        android:id="@+id/logo"
+        android:id="@+id/progressBarHorizontal"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:indeterminate="false"
+        android:max="100"
+        android:minHeight="50dp"
+        android:minWidth="200dp"
+        android:progress="1"
+        android:progressBackgroundTint="@android:color/darker_gray"
+        android:progressTint="@color/colorPrimary"
+        android:layout_below="@+id/tv_automator"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"/>
 
 
 </RelativeLayout>

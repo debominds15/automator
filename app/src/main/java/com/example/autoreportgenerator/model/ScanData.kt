@@ -19,6 +19,7 @@ data class ScanData(
     @SerializedName("mvp") var mvp: String? = null,
     @SerializedName("placentaLocation") var placentaLocation: String? = null,
     @SerializedName("pdfUrl") var pdfUrl: String? = null,
+    @SerializedName("publicId") var publicId: String? = null,
     @SerializedName("summary") var summary: String? = null,
     @SerializedName("createdAt") var createdAt: String? = null,
     @SerializedName("__v") var _v: Int? = null
